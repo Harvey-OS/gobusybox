@@ -20,6 +20,7 @@ import (
 var (
 	outputPath = flag.String("o", "bb", "Path to compiled busybox binary")
 	genDir     = flag.String("gen-dir", "", "Directory to generate source in")
+	genOnly    = flag.Bool("g", false, "Generate but do not build binaries")
 )
 
 func main() {
@@ -59,6 +60,7 @@ func main() {
 		CommandPaths: flag.Args(),
 		BinaryPath:   o,
 		GoBuildOpts:  bopts,
+		GenerateOnly: *genOnly,
 	}
 	if err := bb.BuildBusybox(opts); err != nil {
 		l.Print(err)

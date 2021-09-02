@@ -96,6 +96,10 @@ type Opts struct {
 	//
 	// If this is done with GO111MODULE=on,
 	AllowMixedMode bool
+
+	// Generate the tree but don't build it. This is useful for systems
+	// like Tamago which have their own way of building.
+	GenerateOnly bool
 }
 
 // BuildBusybox builds a busybox of many Go commands. opts contains both the
@@ -132,6 +136,9 @@ func BuildBusybox(opts *Opts) (nerr error) {
 		}
 		tmpDir = absDir
 	} else {
+		if opts.GenerateOnly {
+			return fmt.Errorf("generate switch requires that generate directory be supplied")
+		}
 		var err error
 		tmpDir, err = ioutil.TempDir("", "bb-")
 		if err != nil {
@@ -198,6 +205,10 @@ func BuildBusybox(opts *Opts) (nerr error) {
 
 	if err := writeBBMain(bbDir, tmpDir, bbImports); err != nil {
 		return fmt.Errorf("failed to write main.go: %v", err)
+	}
+
+	if opts.GenerateOnly {
+		return nil
 	}
 
 	// Compile bb.
